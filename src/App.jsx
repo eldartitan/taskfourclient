@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import { useNavigate } from "react-router-dom";
-import { deleteRemove, getUsers, postBlock, postLogout, postRemove } from "./store/userSlice";
+import { deleteRemove, getUsers, postBlock, postLogout } from "./store/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Container from "react-bootstrap/esm/Container";
 import Table from "react-bootstrap/Table";
 import Stack from "react-bootstrap/esm/Stack";
 import Button from "react-bootstrap/Button";
-import Dropdown from "react-bootstrap/Dropdown";
-import DropdownButton from "react-bootstrap/DropdownButton";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 function App() {

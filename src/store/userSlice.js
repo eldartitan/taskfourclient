@@ -1,8 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios, { Axios } from "axios";
-import { useDispatch } from "react-redux";
+import axios from "axios";
 
-const API_URL = "https://taskfourbackend.up.railway.app/api";
+const API_URL = "https://colossal-wool-production.up.railway.app/api";
 
 export const getUsers = createAsyncThunk(
   "user/getUsers",

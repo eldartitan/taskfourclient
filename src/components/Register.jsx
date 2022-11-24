@@ -4,14 +4,12 @@ import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import { useNavigate } from "react-router-dom";
 import { postRegister } from "../store/userSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import Stack from "react-bootstrap/esm/Stack";
 
 function Register() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { error, status } = useSelector((state) => state.user);
   const [registerUsername, setRegisterUsername] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
