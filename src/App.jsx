@@ -24,7 +24,7 @@ function App() {
     else dispatch(setCheck(check.filter((p) => p !== id)));
   };
   const allChange = (e) => {
-    if (!e.target.checked) setCheck([])
+    if (!e.target.checked) dispatch(setCheck([]))
     else dispatch(setCheck(users.map((m) => m._id)));
   };
   console.log(check);
