@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { postLogin } from "../store/userSlice";
+import { postLogin, setError } from "../store/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -18,6 +18,10 @@ function Login() {
   const handleClick = () => {
     dispatch(postLogin({ email: loginEmail, password: loginPassword }));
   };
+  const navRegister = () => {
+    dispatch(setError())
+    navigate("/register");
+  }
 
   return (
     <Container className="d-flex align-items-center justify-content-center">
@@ -43,7 +47,7 @@ function Login() {
           <Button
             variant="primary"
             type="button"
-            onClick={() => navigate("/register")}
+            onClick={navRegister}
           >
             Register
           </Button>

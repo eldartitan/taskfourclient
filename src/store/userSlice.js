@@ -31,12 +31,17 @@ export const postLogin = createAsyncThunk(
         .post(`${API_URL}/auth/login`, data, {
           withCredentials: true,
         })
-        .then((res) => res);
-      console.log(response.statusText);
+        .then((res) => res)
+        .catch((err) => {
+          console.log(err);
+          return err.response.data;
+        });
+      console.log(response);
 
       if (![200, 201].includes(response.status)) {
-        throw new Error("Server Error!");
+        throw new Error(response.message || "Server error");
       }
+
       return response;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -73,12 +78,15 @@ export const postRegister = createAsyncThunk(
         .post(`${API_URL}/auth/register`, data, {
           withCredentials: true,
         })
-        .then((res) => res);
+        .then((res) => res)
+        .catch((err) => {
+          console.log(err);
+          return err.response.data;
+        });
       console.log(response);
-      console.log(typeof response.status);
 
       if (![200, 201].includes(response.status)) {
-        throw new Error("Server Error!");
+        throw new Error(response.message || "Server error");
       }
       return response;
     } catch (error) {
@@ -94,14 +102,17 @@ export const postBlock = createAsyncThunk(
     try {
       const response = await axios
         .post(`${API_URL}/users/block`, data, { withCredentials: true })
-        .then((res) => res);
-      console.log(response.statusText);
+        .then((res) => res)
+        .catch((err) => {
+          console.log(err);
+          return err.response.data;
+        });
       console.log(response);
 
       if (![200, 201].includes(response.status)) {
-        throw new Error("Server Error!");
+        throw new Error(response.message || "Server error");
       }
-      return {data: response.data, block: data.block};
+      return { data: response.data, block: data.block };
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -149,6 +160,9 @@ export const userSlice = createSlice({
     setCheck: (state, action) => {
       state.check = action.payload;
     },
+    setError: (state, action) => {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -178,6 +192,7 @@ export const userSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.status = "log";
+        console.log(action.payload)
         state.logId = action.payload.data;
       })
       .addCase(postLogout.pending, (state) => {
@@ -199,7 +214,7 @@ export const userSlice = createSlice({
         state.error = null;
         console.log(state.check);
         state.users = state.users?.map((f) => {
-          if (state.check.includes(f._id)) f.blocked = action.payload.block
+          if (state.check.includes(f._id)) f.blocked = action.payload.block;
           return f;
         });
         state.check = [];
@@ -211,6 +226,7 @@ export const userSlice = createSlice({
       .addCase(deleteRemove.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
+        // if (state.check.includes(state?.logId)) state.status = null
         state.check.forEach((el) => {
           state.users = state.users?.filter((f) => f._id !== el);
         });
@@ -225,6 +241,6 @@ export const userSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setCheck } = userSlice.actions;
+export const { setCheck, setError } = userSlice.actions;
 
 export default userSlice.reducer;
