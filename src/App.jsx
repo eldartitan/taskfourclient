@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "./App.css";
-import { useNavigate } from "react-router-dom";
-import { deleteRemove, getUsers, postBlock, postLogout } from "./store/userSlice";
+import { deleteRemove, getUsers, postBlock, postLogout, setCheck } from "./store/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Container from "react-bootstrap/esm/Container";
 import Table from "react-bootstrap/Table";
@@ -11,32 +10,22 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 function App() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { users, error, status } = useSelector((state) => state.user);
-  const [check, setCheck] = useState([]);
+  const { users, error, logId, check } = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(getUsers());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (error) navigate("/login");
-  });
-
   const handleClick = () => {
     dispatch(postLogout());
-    navigate("/login");
   };
   const handleChange = (e, id) => {
-    if (e.target.checked) setCheck([...check, id]);
-    else setCheck(check.filter((p) => p !== id));
+    if (e.target.checked) dispatch(setCheck([...check, id]));
+    else dispatch(setCheck(check.filter((p) => p !== id)));
   };
   const allChange = (e) => {
-    if (!e.target.checked) {
-      setCheck([]);
-    } else {
-      setCheck(users.map((m) => m._id));
-    }
+    if (!e.target.checked) setCheck([])
+    else dispatch(setCheck(users.map((m) => m._id)));
   };
   console.log(check);
 
@@ -49,8 +38,7 @@ function App() {
               <Button
                 onClick={() => {
                   dispatch(postBlock({ users_id: check, block: true }));
-                  dispatch(getUsers());
-                  setCheck([]);
+                  if (check.includes(logId)) handleClick();
                 }}
               >
                 Block
@@ -58,8 +46,6 @@ function App() {
               <Button
                 onClick={() => {
                   dispatch(postBlock({ users_id: check, block: false }));
-                  dispatch(getUsers());
-                  setCheck([]);
                 }}
               >
                 Unblock
@@ -67,8 +53,7 @@ function App() {
               <Button
                 onClick={() => {
                   dispatch(deleteRemove({ users_id: check }));
-                  dispatch(getUsers());
-                  setCheck([]);
+                  if (check.includes(logId)) handleClick();
                 }}
               >
                 Delete
@@ -87,7 +72,7 @@ function App() {
                 <th>Id</th>
                 <th>Name</th>
                 <th>email</th>
-                <th>blocked</th>
+                <th>Status</th>
                 <th>Last log</th>
                 <th>Created</th>
               </tr>
@@ -107,9 +92,9 @@ function App() {
                     <td>{user._id}</td>
                     <td>{user.username}</td>
                     <td>{user.email}</td>
-                    <td>{user.blocked ? "yes" : "no"}</td>
-                    <td>{user.lastLogged || "just created"}</td>
-                    <td>{user.createdAt}</td>
+                    <td>{user.blocked ? "blocked" : "active"}</td>
+                    <td>{user.lastLogged?.replace("T", " ").slice(0, user.createdAt.length-5) || "just created"}</td>
+                    <td>{user.createdAt?.replace("T", " ").slice(0, user.createdAt.length-5)}</td>
                   </tr>
                 ))}
             </tbody>

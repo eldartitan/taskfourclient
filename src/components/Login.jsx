@@ -1,28 +1,23 @@
-import "bootstrap/dist/css/bootstrap.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { postLogin } from "../store/userSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
+import Alert from "react-bootstrap/Alert";
 
 function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { error, status } = useSelector((state) => state.user);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const { error } = useSelector((state) => state.user);
 
   const handleClick = () => {
     dispatch(postLogin({ email: loginEmail, password: loginPassword }));
   };
-
-  useEffect(() => {
-    if (error === null && status) navigate("/")
-  })
 
   return (
     <Container className="d-flex align-items-center justify-content-center">
@@ -43,6 +38,7 @@ function Login() {
             onChange={(e) => setLoginPassword(e.target.value)}
           />
         </Form.Group>
+        {error && <Alert variant="danger">{error}</Alert>}
         <Stack direction="horizontal" gap={2}>
           <Button
             variant="primary"
@@ -51,11 +47,7 @@ function Login() {
           >
             Register
           </Button>
-          <Button
-            variant="primary"
-            className="ms-auto"
-            onClick={handleClick}
-          >
+          <Button variant="primary" className="ms-auto" onClick={handleClick}>
             Submit
           </Button>
         </Stack>

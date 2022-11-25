@@ -1,15 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { postRegister } from "../store/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
-import { useNavigate } from "react-router-dom";
-import { postRegister } from "../store/userSlice";
-import { useDispatch } from "react-redux";
 import Stack from "react-bootstrap/esm/Stack";
+import Alert from "react-bootstrap/Alert";
 
 function Register() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { error } = useSelector((state) => state.user);
   const [registerUsername, setRegisterUsername] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
@@ -55,6 +57,7 @@ function Register() {
             onChange={(e) => setRegisterPassword(e.target.value)}
           />
         </Form.Group>
+        {error && <Alert variant="danger">{error}</Alert>}
         <Stack direction="horizontal" gap={2}>
           <Button variant="primary" type="button" onClick={() => navigate("/login")}>
             Login

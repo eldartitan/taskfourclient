@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const API_URL = "https://colossal-wool-production.up.railway.app/api";
+// const API_URL = "http://localhost:3001/api";
 
 export const getUsers = createAsyncThunk(
   "user/getUsers",
@@ -24,6 +25,7 @@ export const getUsers = createAsyncThunk(
 export const postLogin = createAsyncThunk(
   "user/postLogin",
   async function (data, { rejectWithValue }) {
+    console.log("START LOGIN");
     try {
       const response = await axios
         .post(`${API_URL}/auth/login`, data, {
@@ -99,7 +101,7 @@ export const postBlock = createAsyncThunk(
       if (![200, 201].includes(response.status)) {
         throw new Error("Server Error!");
       }
-      return response.data;
+      return {data: response.data, block: data.block};
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -128,10 +130,12 @@ export const deleteRemove = createAsyncThunk(
 );
 
 const initialState = {
-  users: null,
+  users: [],
   loading: null,
   error: null,
   status: false,
+  logId: null,
+  check: [],
 };
 
 function isError(action) {
@@ -141,7 +145,11 @@ function isError(action) {
 export const userSlice = createSlice({
   name: "counter",
   initialState,
-  reducers: {},
+  reducers: {
+    setCheck: (state, action) => {
+      state.check = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getUsers.pending, (state) => {
@@ -160,6 +168,7 @@ export const userSlice = createSlice({
       .addCase(postRegister.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
+        state.status = "reg";
       })
       .addCase(postLogin.pending, (state) => {
         state.loading = true;
@@ -168,7 +177,8 @@ export const userSlice = createSlice({
       .addCase(postLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.status = true;
+        state.status = "log";
+        state.logId = action.payload.data;
       })
       .addCase(postLogout.pending, (state) => {
         state.loading = true;
@@ -178,6 +188,7 @@ export const userSlice = createSlice({
         state.loading = false;
         state.status = false;
         state.users = null;
+        state.logId = null;
       })
       .addCase(postBlock.pending, (state) => {
         state.loading = true;
@@ -186,6 +197,12 @@ export const userSlice = createSlice({
       .addCase(postBlock.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
+        console.log(state.check);
+        state.users = state.users?.map((f) => {
+          if (state.check.includes(f._id)) f.blocked = action.payload.block
+          return f;
+        });
+        state.check = [];
       })
       .addCase(deleteRemove.pending, (state) => {
         state.loading = true;
@@ -194,6 +211,10 @@ export const userSlice = createSlice({
       .addCase(deleteRemove.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
+        state.check.forEach((el) => {
+          state.users = state.users?.filter((f) => f._id !== el);
+        });
+        state.check = [];
       })
       .addMatcher(isError, (state, action) => {
         console.log(action.payload);
@@ -204,10 +225,6 @@ export const userSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-// export const { logged_out } = userSlice.actions;
+export const { setCheck } = userSlice.actions;
 
 export default userSlice.reducer;
-
-// export const loginAsync = () => {
-//   const dispatch = useDispatch();
-// }
